@@ -45,9 +45,10 @@ pip install -r requirements_base.txt
 
 ### ⏬ Download weights
 Option 1: Download pre-trained weights of base models and other components ([sd-image-variations-diffusers](https://huggingface.co/lambdalabs/sd-image-variations-diffusers) and [sd-vae-ft-mse](https://huggingface.co/stabilityai/sd-vae-ft-mse)). You can run the following command to download weights automatically:
-    ```
-    python tools/download_weights.py
-    ```
+    
+```bash
+python tools/download_weights.py
+```
 
 Option 2: Download pre-trained weights into the `./pretrained_weights` folder from one of the below URLs:
     
