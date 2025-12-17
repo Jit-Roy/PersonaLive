@@ -24,7 +24,7 @@ from webcam.util import pil_to_frame, bytes_to_pil, is_firefox, bytes_to_tensor
 from webcam.connection_manager import ConnectionManager, ServerFullException
 import multiprocessing as mp
 
-use_trt = True
+use_trt = False # set to True to use TensorRT acceleration
 
 if use_trt:
     from webcam.vid2vid_trt import Pipeline

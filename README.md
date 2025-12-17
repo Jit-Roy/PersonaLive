@@ -37,7 +37,7 @@ conda create -n personalive python=3.10
 conda activate personalive
 
 # Install packages with pip
-pip install -r requirements.txt
+pip install -r requirements_base.txt
 ```
 
 ### ⏬ Download weights
@@ -68,7 +68,7 @@ pretrained_weights
 ├── sd-vae-ft-mse
 │   ├── diffusion_pytorch_model.bin
 │   └── config.json
-└── sd-image-variations-diffusers
+├── sd-image-variations-diffusers
 │   ├── image_encoder
 │   │   ├── pytorch_model.bin
 │   │   └── config.json
@@ -98,8 +98,11 @@ source start.sh
 #### 🏎️ Acceleration (Optional)
 Converting the model to TensorRT can significantly speed up inference (~ 2x ⚡️). Building the engine may take about `20 minutes` depending on your device. Note that TensorRT optimizations may lead to slight variations or a small drop in output quality.
 ```
+pip install -r requirement_trt.txt
+
 python torch2trt.py
 ```
+*The provided TensorRT model is from an `H100`. We recommend `ALL users` (including H100 users) re-run `python torch2trt.py` locally to ensure best compatibility.*
 
 #### ▶️ Start Streaming
 ```
