@@ -132,6 +132,19 @@ pip install -r requirements_trt.txt
 # Converting the model to TensorRT
 python torch2trt.py
 ```
+💡 **PyCUDA Installation Issues**: If you encounter a "Failed to build wheel for pycuda" error during the installation above, please follow these steps:
+```
+# Install PyCUDA manually using Conda (avoids compilation issues):
+conda install -c conda-forge pycuda
+
+# Open requirements_trt.txt and comment out or remove the line "pycuda==2024.1.2"
+
+# Install other packages with pip
+pip install -r requirements_trt.txt
+
+# Converting the model to TensorRT
+python torch2trt.py
+```
 ⚠️ The provided TensorRT model is from an `H100`. We recommend `ALL users` (including H100 users) re-run `python torch2trt.py` locally to ensure best compatibility.
 
 #### ▶️ Start Streaming
