@@ -95,6 +95,26 @@ def main(args):
             print(f'  - pose_guider: {os.path.basename(pose_guider_path)}')
             print(f'  - temporal_module: {os.path.basename(temporal_module_path)}')
             print(f'  - motion_extractor: {os.path.basename(motion_extractor_path)}')
+            
+            # Check if VAE and base model exist in model_dir, otherwise use HuggingFace
+            vae_dir = os.path.join(model_dir, 'sd-vae-ft-mse')
+            base_model_dir = os.path.join(model_dir, 'sd-image-variations-diffusers')
+            
+            if os.path.exists(vae_dir):
+                config.vae_path = vae_dir
+                print(f'Using VAE from: {vae_dir}')
+            else:
+                config.vae_path = 'stabilityai/sd-vae-ft-mse'
+                print(f'VAE not found in model_dir, downloading from HuggingFace: {config.vae_path}')
+            
+            if os.path.exists(base_model_dir):
+                config.pretrained_base_model_path = base_model_dir
+                config.image_encoder_path = os.path.join(base_model_dir, 'image_encoder')
+                print(f'Using base model from: {base_model_dir}')
+            else:
+                config.pretrained_base_model_path = 'lambdalabs/sd-image-variations-diffusers'
+                config.image_encoder_path = 'lambdalabs/sd-image-variations-diffusers'
+                print(f'Base model not found in model_dir, downloading from HuggingFace: {config.pretrained_base_model_path}')
         else:
             print(f"ERROR: 'personalive' subfolder not found in {model_dir}")
             print(f"Expected structure: {model_dir}/personalive/[model files]")
