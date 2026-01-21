@@ -144,6 +144,8 @@ def main(args):
         from huggingface_hub import snapshot_download
         base_model_path = snapshot_download(repo_id=config.pretrained_base_model_path)
         print(f'Downloaded base model to cache: {base_model_path}')
+        # Update image_encoder_path to use the cached local path
+        config.image_encoder_path = os.path.join(base_model_path, 'image_encoder')
     
     denoising_unet = UNet3DConditionModel.from_pretrained_2d(
         base_model_path,
