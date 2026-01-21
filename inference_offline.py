@@ -39,6 +39,7 @@ def parse_args():
     parser.add_argument("--stream_gen", type=bool, default=True, help='use streaming generation strategy to reduce VRAM usage.')
     parser.add_argument("--reference_image", type=str, default='', help='Path to reference image. If provided, overrides test_cases from config.')
     parser.add_argument("--driving_video", type=str, default='', help='Path to driving video. If provided, overrides test_cases from config.')
+    parser.add_argument("--model_dir", type=str, default='', help='Path to model directory containing personalive subfolder with all model weights. If provided, will auto-detect and use models from this directory.')
     args = parser.parse_args()
 
     return args
@@ -47,6 +48,57 @@ def main(args):
     device = args.device
     print('device', device)
     config = OmegaConf.load(args.config)
+    
+    # Auto-detect and override model paths if model_dir is provided
+    if args.model_dir:
+        model_dir = os.path.abspath(args.model_dir)
+        print(f'Using model directory: {model_dir}')
+        
+        # Check for personalive subfolder
+        personalive_dir = os.path.join(model_dir, 'personalive')
+        if os.path.exists(personalive_dir):
+            # Auto-detect all model files
+            denoising_unet_path = os.path.join(personalive_dir, 'denoising_unet.pth')
+            reference_unet_path = os.path.join(personalive_dir, 'reference_unet.pth')
+            motion_encoder_path = os.path.join(personalive_dir, 'motion_encoder.pth')
+            pose_guider_path = os.path.join(personalive_dir, 'pose_guider.pth')
+            temporal_module_path = os.path.join(personalive_dir, 'temporal_module.pth')
+            motion_extractor_path = os.path.join(personalive_dir, 'motion_extractor.pth')
+            
+            # Verify all required files exist
+            required_files = {
+                'denoising_unet': denoising_unet_path,
+                'reference_unet': reference_unet_path,
+                'motion_encoder': motion_encoder_path,
+                'pose_guider': pose_guider_path,
+                'temporal_module': temporal_module_path,
+                'motion_extractor': motion_extractor_path
+            }
+            
+            missing_files = []
+            for name, path in required_files.items():
+                if not os.path.exists(path):
+                    missing_files.append(f"{name} ({path})")
+            
+            if missing_files:
+                print(f"ERROR: Missing required model files:")
+                for missing in missing_files:
+                    print(f"  - {missing}")
+                sys.exit(1)
+            
+            # Override config with detected paths
+            config.denoising_unet_path = denoising_unet_path
+            print(f'Auto-detected models from: {personalive_dir}')
+            print(f'  - denoising_unet: {os.path.basename(denoising_unet_path)}')
+            print(f'  - reference_unet: {os.path.basename(reference_unet_path)}')
+            print(f'  - motion_encoder: {os.path.basename(motion_encoder_path)}')
+            print(f'  - pose_guider: {os.path.basename(pose_guider_path)}')
+            print(f'  - temporal_module: {os.path.basename(temporal_module_path)}')
+            print(f'  - motion_extractor: {os.path.basename(motion_extractor_path)}')
+        else:
+            print(f"ERROR: 'personalive' subfolder not found in {model_dir}")
+            print(f"Expected structure: {model_dir}/personalive/[model files]")
+            sys.exit(1)
 
     if config.weight_dtype == "fp16":
         weight_dtype = torch.float16
