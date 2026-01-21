@@ -130,12 +130,23 @@ def main(args):
     # vae_tiny = AutoencoderTiny.from_pretrained(config.vae_tiny_path).to(device, dtype=weight_dtype)
 
     infer_config = OmegaConf.load(config.inference_config)
+    
+    # Load reference_unet first to get the cached model path for custom loaders
     reference_unet = UNet2DConditionModel.from_pretrained(
         config.pretrained_base_model_path,
         subfolder="unet",
     ).to(device=device, dtype=weight_dtype)
+    
+    # If using HuggingFace model, get the local cache path for custom loaders
+    base_model_path = config.pretrained_base_model_path
+    if not os.path.exists(base_model_path):
+        # It's a HuggingFace model ID, get the cached path
+        from huggingface_hub import snapshot_download
+        base_model_path = snapshot_download(repo_id=config.pretrained_base_model_path)
+        print(f'Downloaded base model to cache: {base_model_path}')
+    
     denoising_unet = UNet3DConditionModel.from_pretrained_2d(
-        config.pretrained_base_model_path,
+        base_model_path,
         "",
         subfolder="unet",
         unet_additional_kwargs=infer_config.unet_additional_kwargs,
