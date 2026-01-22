@@ -60,12 +60,14 @@ def concatenate_videos(video_paths, output_path, audio_source=None):
             add_audio_to_video(output_path, audio_source)
         return True
     
-    # Create a temporary file list for ffmpeg
-    list_file = output_path.replace('.mp4', '_filelist.txt')
+    # Create a temporary file list for ffmpeg in the same directory as first video
+    list_file = os.path.join(os.path.dirname(video_paths[0]), 'concat_list.txt')
     with open(list_file, 'w') as f:
         for video_path in video_paths:
-            # Use forward slashes and escape special characters
-            escaped_path = video_path.replace('\\', '/').replace("'", "'\\''")
+            # Convert to absolute path to avoid relative path issues
+            abs_path = os.path.abspath(video_path)
+            # Use forward slashes and escape special characters for ffmpeg
+            escaped_path = abs_path.replace('\\', '/').replace("'", "'\\''")
             f.write(f"file '{escaped_path}'\n")
     
     try:
