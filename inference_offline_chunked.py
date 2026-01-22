@@ -414,6 +414,14 @@ def main(args):
                 
                 chunk_end = chunk_idx + actual_chunk_size
                 
+                # Check if chunk already exists
+                chunk_path = os.path.join(temp_chunks_dir, f'chunk_{chunk_idx:06d}.mp4')
+                if os.path.exists(chunk_path):
+                    print(f"\n--- Chunk {chunk_idx // chunk_size + 1} already exists, skipping processing ---")
+                    print(f"Using existing: {chunk_path}")
+                    chunk_video_paths.append(chunk_path)
+                    continue
+                
                 print(f"\n--- Processing chunk {chunk_idx // chunk_size + 1}: frames {chunk_idx} to {chunk_end-1} ---")
                 
                 # Load chunk frames
@@ -491,17 +499,10 @@ def main(args):
                 # Since it would require loading entire video in memory
                 print("Note: Concatenated grid view (4-row) skipped for chunked processing to save memory")
                 
-                # Clean up temporary chunks
-                print("Cleaning up temporary chunks...")
-                for chunk_path in chunk_video_paths:
-                    if os.path.exists(chunk_path):
-                        os.remove(chunk_path)
-                
-                if os.path.exists(temp_chunks_dir):
-                    try:
-                        os.rmdir(temp_chunks_dir)
-                    except:
-                        pass  # Directory might not be empty
+                # Keep temporary chunks for reuse
+                print(f"\n✓ Temporary chunks saved in: {temp_chunks_dir}")
+                print("  These chunks can be reused if you run the same video again.")
+                print("  Delete this folder manually if you want to regenerate from scratch.")
             else:
                 print(f"❌ Failed to concatenate videos")
 
